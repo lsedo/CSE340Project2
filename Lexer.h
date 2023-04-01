@@ -7,10 +7,14 @@
 
 namespace special
 {
-    const char DELIMITER = ' ';
-    const char EOL       = '@';
-    const char EPSILON   = '#';
-}
+    const char          DELIMITER     = ' ';
+    const std::string   EF            = "@@";
+    const char          EL            = '@'; 
+    const char          EI            = '$';
+    const char          EPSILON       = '#';
+    const char          OR            = '|';
+    const std::string   PRODUCTION    = "->";   
+};
 
 class Lexer     // Lexical analyzer
 {
@@ -32,11 +36,11 @@ class Lexer     // Lexical analyzer
     void resetIndices();
     
     bool hasTokens();
-    
-    protected:
-    
     bool checkEOL();
     bool checkDLM();
+    
+    protected:
+      
     void initToken();    
     
     private:
@@ -60,10 +64,11 @@ class Flexer : public Lexer    // File lexical analyzer
     
     void fOpen(std::string fl);
     bool fValid();
+    bool checkEOF();
     
     protected:
     
-    bool checkEOF();
+
     void fInitLine();  
     
     private:

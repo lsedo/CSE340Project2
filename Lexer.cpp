@@ -50,12 +50,22 @@ std::string Lexer::peekToken()
             }
         }
     }
+
+    if(checkEOL())
+    {
+        std::string tkEOL(1, special::EL);
+        return tkEOL;
+    }
+    else
+    {  
+        std::string token = getToken();
+        tkStart = originStart;
+        tkEnd = originEnd;
     
-    std::string token = getToken();
-    tkStart = originStart;
-    tkEnd = originEnd;
+        return token;
+    }
     
-    return token;
+  
 }
 
 std::string Lexer::readToken()
@@ -63,6 +73,8 @@ std::string Lexer::readToken()
     bool tkFound = false;
     bool nextStartFound = false;
     int iterations = 0;
+    int originStart = tkStart;
+    int originEnd= tkEnd;
     
     while(!tkFound)
     {
@@ -100,7 +112,16 @@ std::string Lexer::readToken()
         }
     }
     
-    return getToken();
+    if(checkEOL())
+    {
+        std::string tkEOL(1, special::EL);
+        return tkEOL;
+    }
+    else
+    {
+        return getToken();
+    }
+    
 }
 
 std::string Lexer::getToken()
@@ -110,7 +131,7 @@ std::string Lexer::getToken()
 
 std::string Lexer::getLine()
 {
-    return "";
+    return line;
 }
 
 int Lexer::getTokenStart()
@@ -143,7 +164,7 @@ bool Lexer::hasTokens()
 
 bool Lexer::checkEOL()
 {
-    return (tkEnd >= line.length()) || (line.at(tkEnd) == special::EOL);
+    return (tkEnd >= line.length() - 1) || (line.at(tkEnd) == special::EL);
 }
 
 bool Lexer::checkDLM()
@@ -207,20 +228,21 @@ void Lexer::initToken()
 
 Flexer::Flexer()
 {
-
+    resetIndices();
 }
 
 Flexer::Flexer(std::string fl)
 {
     fOpen(fl);
     fInitLine();
-    resetIndices();
-    initToken();
 }
 
 void Flexer::fNextLine()
 {
-    fInitLine();
+    if(!checkEOF())
+    {
+        fInitLine();
+    }
 }
 
 void Flexer::fOpen(std::string fl)
@@ -233,9 +255,19 @@ bool Flexer::fValid()
     return file.is_open();
 }
 
+bool Flexer::checkEOF()
+{
+    if(getLine().compare(special::EF) == 0)
+    {
+        return true;
+    }
+
+    return !file.good();
+}
+
 void Flexer::fInitLine()
 {
-    std::string ln = "";
+    std::string ln;
     std::getline(file, ln);
     
     setLine(ln);
